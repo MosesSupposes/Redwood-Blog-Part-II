@@ -1,4 +1,6 @@
-import { render, screen, within } from '@redwoodjs/testing'
+import { render, screen, waitFor } from '@redwoodjs/testing'
+
+import { standard } from 'src/components/CommentsCell/CommentsCell.mock'
 
 import Article from './Article'
 
@@ -15,6 +17,15 @@ describe('Article', () => {
 
     expect(screen.getByText(ARTICLE.title)).toBeInTheDocument()
     expect(screen.getByText(ARTICLE.body)).toBeInTheDocument()
+  })
+
+  it('renders comments when displaying a full blog post', async () => {
+    const comment = standard().comments[0]
+    render(<Article article={ARTICLE} />)
+
+    await waitFor(() =>
+      expect(screen.getByText(comment.body)).toBeInTheDocument()
+    )
   })
 
   it('renders a summary of a blog post', () => {
@@ -38,4 +49,12 @@ describe('Article', () => {
     expect(screen.getByText(ARTICLE.body, {exact: true})).toBeInTheDocument()
   })
 
+  it('does not render comments when displaying a summary', async () => {
+    const comment = standard().comments[0]
+    render(<Article article={ARTICLE} summary={true} />)
+
+    await waitFor(() =>
+      expect(screen.queryByText(comment.body)).not.toBeInTheDocument()
+    )
+  })
 })
